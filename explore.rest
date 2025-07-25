@@ -1,0 +1,57 @@
+@baseUrl = http://localhost:8080
+
+### Valid
+POST {{baseUrl}}/phones
+Content-Type: application/json
+
+{
+  "phone": "380950000000"
+}
+
+> {%
+    client.test("Valid request", function () {
+        client.assert(response.status === 204);
+    });
+%}
+
+### Invalid: Invalid value
+POST {{baseUrl}}/phones
+Content-Type: application/json
+
+{
+  "phone": "+380950000000"
+}
+
+> {%
+    client.test("Invalid request", function () {
+        client.assert(response.status === 400);
+    });
+%}
+
+### Invalid: Property is absent
+POST {{baseUrl}}/phones
+Content-Type: application/json
+
+{
+}
+
+> {%
+    client.test("Invalid request", function () {
+        client.assert(response.status === 400);
+    });
+%}
+
+### Invalid: Unexpected property
+POST {{baseUrl}}/phones
+Content-Type: application/json
+
+{
+  "phone": "380950000000",
+  "email": "john@example.com"
+}
+
+> {%
+    client.test("Invalid request", function () {
+        client.assert(response.status === 400);
+    });
+%}
