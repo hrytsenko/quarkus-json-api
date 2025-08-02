@@ -40,14 +40,19 @@ public @interface ValidateRequest {
     @SneakyThrows
     @Override
     public Object aroundReadFrom(ReaderInterceptorContext context) {
+      log.info("Validate request for '{}:{}'",
+          resourceInfo.getResourceClass().getSimpleName(),
+          resourceInfo.getResourceMethod().getName());
+
       var originalContent = context.getInputStream().readAllBytes();
 
       var request = new String(originalContent, StandardCharsets.UTF_8);
-      String schema = resourceInfo.getResourceMethod().getAnnotation(ValidateRequest.class).schema();
+      var schema = resourceInfo.getResourceMethod()
+          .getAnnotation(ValidateRequest.class).schema();
       try {
         validator.validate(request, schema);
       } catch (SchemaValidator.Exception exception) {
-        log.error("Validation failed: {}", exception.getViolations());
+        log.error("Invalid request: {}", exception.getViolations());
         throw new WebApplicationException(
             Response.status(Response.Status.BAD_REQUEST).build());
       }

@@ -40,23 +40,28 @@ public @interface ValidateResponse {
     @SneakyThrows
     @Override
     public void aroundWriteTo(WriterInterceptorContext context) {
+      log.info("Validate response for '{}:{}'",
+          resourceInfo.getResourceClass().getSimpleName(),
+          resourceInfo.getResourceMethod().getName());
+
       var originalStream = context.getOutputStream();
-      var buffer = new ByteArrayOutputStream();
-      context.setOutputStream(buffer);
+      var interceptorStream = new ByteArrayOutputStream();
+      context.setOutputStream(interceptorStream);
 
       context.proceed();
 
-      String response = buffer.toString(StandardCharsets.UTF_8);
-      String schema = resourceInfo.getResourceMethod().getAnnotation(ValidateResponse.class).schema();
+      var response = interceptorStream.toString(StandardCharsets.UTF_8);
+      var schema = resourceInfo.getResourceMethod()
+          .getAnnotation(ValidateResponse.class).schema();
       try {
         validator.validate(response, schema);
       } catch (SchemaValidator.Exception exception) {
-        log.error("Validation failed: {}", exception.getViolations());
+        log.error("Invalid response: {}", exception.getViolations());
         throw new WebApplicationException(
             Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
       }
 
-      originalStream.write(buffer.toByteArray());
+      originalStream.write(interceptorStream.toByteArray());
       originalStream.flush();
     }
 
