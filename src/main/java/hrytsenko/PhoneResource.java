@@ -1,4 +1,4 @@
-package schema;
+package hrytsenko;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;

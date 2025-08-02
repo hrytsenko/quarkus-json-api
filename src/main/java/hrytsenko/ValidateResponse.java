@@ -1,4 +1,4 @@
-package schema;
+package hrytsenko;
 
 import jakarta.enterprise.util.Nonbinding;
 import jakarta.inject.Inject;
@@ -40,7 +40,7 @@ public @interface ValidateResponse {
     @SneakyThrows
     @Override
     public void aroundWriteTo(WriterInterceptorContext context) {
-      log.info("Validate response for '{}:{}'",
+      log.debug("Validate response for '{}:{}'",
           resourceInfo.getResourceClass().getSimpleName(),
           resourceInfo.getResourceMethod().getName());
 

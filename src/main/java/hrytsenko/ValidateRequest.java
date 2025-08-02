@@ -1,4 +1,4 @@
-package schema;
+package hrytsenko;
 
 import jakarta.enterprise.util.Nonbinding;
 import jakarta.inject.Inject;
@@ -40,7 +40,7 @@ public @interface ValidateRequest {
     @SneakyThrows
     @Override
     public Object aroundReadFrom(ReaderInterceptorContext context) {
-      log.info("Validate request for '{}:{}'",
+      log.debug("Validate request for '{}:{}'",
           resourceInfo.getResourceClass().getSimpleName(),
           resourceInfo.getResourceMethod().getName());
 
