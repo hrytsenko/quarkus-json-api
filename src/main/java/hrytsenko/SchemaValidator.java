@@ -18,13 +18,12 @@ public class SchemaValidator {
   public static final ObjectMapper JSON_WRITER = new ObjectMapper();
 
   @SneakyThrows
-  public void validate(String jsonRequest, String yamlSchema) {
+  public void validate(String jsonContent, String yamlSchema) {
     String jsonSchema = JSON_WRITER.writeValueAsString(
         YAML_READER.readValue(yamlSchema, Object.class));
 
     try {
-      SchemaLoader.load(new JSONObject(jsonSchema))
-          .validate(new JSONObject(jsonRequest));
+      SchemaLoader.load(new JSONObject(jsonSchema)).validate(new JSONObject(jsonContent));
     } catch (ValidationException exception) {
       throw new Exception("Validation failed", exception.getAllMessages());
     }
