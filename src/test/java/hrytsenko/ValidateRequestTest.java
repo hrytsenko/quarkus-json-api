@@ -7,15 +7,13 @@ import jakarta.ws.rs.ext.ReaderInterceptorContext;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class ValidateRequestTest {
 
@@ -24,7 +22,7 @@ class ValidateRequestTest {
 
   @BeforeEach
   void init() {
-    validator = Mockito.spy(new SchemaValidator());
+    validator = spy(new SchemaValidator());
     interceptor = new ValidateRequest.Interceptor();
     interceptor.validator = validator;
   }
@@ -90,12 +88,12 @@ class ValidateRequestTest {
   }
 
   @SneakyThrows
-  private ReaderInterceptorContext prepareContext(String request, Class<?> resourceClass) {
-    var context = Mockito.mock(ReaderInterceptorContext.class);
-    doReturn(new ByteArrayInputStream(request.getBytes()))
+  private ReaderInterceptorContext prepareContext(String requestBody, Class<?> resourceClass) {
+    var context = mock(ReaderInterceptorContext.class);
+    doReturn(new ByteArrayInputStream(requestBody.getBytes()))
         .when(context).getInputStream();
 
-    var resourceInfo = Mockito.mock(ResourceInfo.class);
+    var resourceInfo = mock(ResourceInfo.class);
     doReturn(resourceClass)
         .when(resourceInfo).getResourceClass();
     doReturn(resourceClass.getMethod("operation", String.class))

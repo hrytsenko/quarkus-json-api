@@ -7,13 +7,13 @@ import jakarta.ws.rs.ext.WriterInterceptorContext;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -24,7 +24,7 @@ class ValidateResponseTest {
 
   @BeforeEach
   void init() {
-    validator = Mockito.spy(new SchemaValidator());
+    validator = spy(new SchemaValidator());
     interceptor = new ValidateResponse.Interceptor();
     interceptor.validator = validator;
   }
@@ -92,7 +92,7 @@ class ValidateResponseTest {
   }
 
   @SneakyThrows
-  private WriterInterceptorContext prepareContext(String response, Class<?> resourceClass) {
+  private WriterInterceptorContext prepareContext(String responseBody, Class<?> resourceClass) {
     class StreamWrapper {
       OutputStream outputStream;
     }
@@ -100,22 +100,20 @@ class ValidateResponseTest {
     var wrapper = new StreamWrapper();
     wrapper.outputStream = new ByteArrayOutputStream();
 
-    var context = Mockito.mock(WriterInterceptorContext.class);
+    var context = mock(WriterInterceptorContext.class);
     doAnswer(it -> wrapper.outputStream)
         .when(context).getOutputStream();
     doAnswer(it -> {
       wrapper.outputStream = it.getArgument(0, OutputStream.class);
       return null;
-    })
-        .when(context).setOutputStream(Mockito.any());
+    }).when(context).setOutputStream(any());
     doAnswer(it -> {
-      context.getOutputStream().write(response.getBytes());
+      context.getOutputStream().write(responseBody.getBytes());
       context.getOutputStream().flush();
       return null;
-    })
-        .when(context).proceed();
+    }).when(context).proceed();
 
-    var resourceInfo = Mockito.mock(ResourceInfo.class);
+    var resourceInfo = mock(ResourceInfo.class);
     doReturn(resourceClass)
         .when(resourceInfo).getResourceClass();
     doReturn(resourceClass.getMethod("operation"))
