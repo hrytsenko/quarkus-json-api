@@ -1,19 +1,21 @@
 package hrytsenko;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ReaderInterceptorContext;
+import java.io.ByteArrayInputStream;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayInputStream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 
 class ValidateRequestTest {
 
@@ -45,6 +47,7 @@ class ValidateRequestTest {
         """;
 
     class Resource {
+
       @ValidateRequest(schema = schema)
       public void operation(String request) {
       }
@@ -74,6 +77,7 @@ class ValidateRequestTest {
         """;
 
     class Resource {
+
       @ValidateRequest(schema = schema)
       public void operation(String request) {
       }
@@ -81,7 +85,8 @@ class ValidateRequestTest {
 
     var context = prepareContext(request, Resource.class);
 
-    var exception = assertThrows(WebApplicationException.class, () -> interceptor.aroundReadFrom(context));
+    var exception = assertThrows(WebApplicationException.class,
+        () -> interceptor.aroundReadFrom(context));
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), exception.getResponse().getStatus());
 
     verify(validator).validate(eq(request), eq(schema));

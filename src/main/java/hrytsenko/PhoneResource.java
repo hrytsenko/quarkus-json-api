@@ -1,6 +1,12 @@
 package hrytsenko;
 
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,6 +37,7 @@ public class PhoneResource {
   }
 
   public record ApiResponse(String phone) {
+
   }
 
   @PUT
@@ -51,6 +58,7 @@ public class PhoneResource {
   }
 
   public record ApiRequest(String phone) {
+
   }
 
 }

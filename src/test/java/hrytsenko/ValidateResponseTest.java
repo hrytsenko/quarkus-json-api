@@ -1,21 +1,24 @@
 package hrytsenko;
 
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.container.ResourceInfo;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.WriterInterceptorContext;
-import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.container.ResourceInfo;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.WriterInterceptorContext;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ValidateResponseTest {
 
@@ -47,6 +50,7 @@ class ValidateResponseTest {
         """;
 
     class Resource {
+
       @ValidateResponse(schema = schema)
       public String operation() {
         return response;
@@ -77,6 +81,7 @@ class ValidateResponseTest {
         """;
 
     class Resource {
+
       @ValidateResponse(schema = schema)
       public String operation() {
         return response;
@@ -85,8 +90,10 @@ class ValidateResponseTest {
 
     var context = prepareContext(response, Resource.class);
 
-    var exception = assertThrows(WebApplicationException.class, () -> interceptor.aroundWriteTo(context));
-    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception.getResponse().getStatus());
+    var exception = assertThrows(WebApplicationException.class,
+        () -> interceptor.aroundWriteTo(context));
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+        exception.getResponse().getStatus());
 
     verify(validator).validate(eq(response), eq(schema));
   }
@@ -94,6 +101,7 @@ class ValidateResponseTest {
   @SneakyThrows
   private WriterInterceptorContext prepareContext(String responseBody, Class<?> resourceClass) {
     class StreamWrapper {
+
       OutputStream outputStream;
     }
 
