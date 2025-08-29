@@ -31,65 +31,65 @@ class ValidateRequestTest {
 
   @Test
   void validRequest() {
+    class Resource {
+
+      static final String REQUEST_SCHEMA = """
+          type: object
+          properties:
+            foo:
+              type: string
+          required:
+            - foo
+          """;
+
+      @ValidateRequest(schema = REQUEST_SCHEMA)
+      public void operation(String request) {
+      }
+
+    }
+
     var request = """
         {
           "foo": "bar"
         }
         """;
-
-    final var schema = """
-        type: object
-        properties:
-          foo:
-            type: string
-        required:
-          - foo
-        """;
-
-    class Resource {
-
-      @ValidateRequest(schema = schema)
-      public void operation(String request) {
-      }
-    }
-
     var context = prepareContext(request, Resource.class);
 
     interceptor.aroundReadFrom(context);
 
-    verify(validator).validate(eq(request), eq(schema));
+    verify(validator).validate(eq(request), eq(Resource.REQUEST_SCHEMA));
   }
 
   @Test
   void invalidRequest() {
+    class Resource {
+
+      static final String REQUEST_SCHEMA = """
+          type: object
+          properties:
+            foo:
+              type: string
+          required:
+            - foo
+          """;
+
+      @ValidateRequest(schema = REQUEST_SCHEMA)
+      public void operation(String request) {
+      }
+
+    }
+
     var request = """
         {
         }
         """;
-
-    final var schema = """
-        type: object
-        properties:
-          foo:
-            type: string
-        required:
-          - foo
-        """;
-
-    class Resource {
-
-      @ValidateRequest(schema = schema)
-      public void operation(String request) {
-      }
-    }
-
     var context = prepareContext(request, Resource.class);
 
     var exception = assertThrows(WebApplicationException.class,
         () -> interceptor.aroundReadFrom(context));
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), exception.getResponse().getStatus());
 
-    verify(validator).validate(eq(request), eq(schema));
+    verify(validator).validate(eq(request), eq(Resource.REQUEST_SCHEMA));
   }
 
   @SneakyThrows
@@ -98,13 +98,13 @@ class ValidateRequestTest {
     doReturn(new ByteArrayInputStream(requestBody.getBytes()))
         .when(context).getInputStream();
 
-    var resourceInfo = mock(ResourceInfo.class);
+    var resource = mock(ResourceInfo.class);
     doReturn(resourceClass)
-        .when(resourceInfo).getResourceClass();
+        .when(resource).getResourceClass();
     doReturn(resourceClass.getMethod("operation", String.class))
-        .when(resourceInfo).getResourceMethod();
+        .when(resource).getResourceMethod();
 
-    interceptor.resourceInfo = resourceInfo;
+    interceptor.resource = resource;
 
     return context;
   }

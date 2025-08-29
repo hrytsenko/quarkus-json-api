@@ -32,7 +32,7 @@ public @interface ValidateResponse {
   class Interceptor implements WriterInterceptor {
 
     @Context
-    ResourceInfo resourceInfo;
+    ResourceInfo resource;
     @Inject
     SchemaValidator validator;
 
@@ -40,8 +40,8 @@ public @interface ValidateResponse {
     @Override
     public void aroundWriteTo(WriterInterceptorContext context) {
       log.debug("Validate response for '{}:{}'",
-          resourceInfo.getResourceClass().getSimpleName(),
-          resourceInfo.getResourceMethod().getName());
+          resource.getResourceClass().getSimpleName(),
+          resource.getResourceMethod().getName());
 
       var originalStream = context.getOutputStream();
       var interceptorStream = new ByteArrayOutputStream();
@@ -50,7 +50,7 @@ public @interface ValidateResponse {
       context.proceed();
 
       var response = interceptorStream.toString(StandardCharsets.UTF_8);
-      var schema = resourceInfo.getResourceMethod()
+      var schema = resource.getResourceMethod()
           .getAnnotation(ValidateResponse.class).schema();
       try {
         validator.validate(response, schema);

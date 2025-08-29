@@ -32,7 +32,7 @@ public @interface ValidateRequest {
   class Interceptor implements ReaderInterceptor {
 
     @Context
-    ResourceInfo resourceInfo;
+    ResourceInfo resource;
     @Inject
     SchemaValidator validator;
 
@@ -40,13 +40,13 @@ public @interface ValidateRequest {
     @Override
     public Object aroundReadFrom(ReaderInterceptorContext context) {
       log.debug("Validate request for '{}:{}'",
-          resourceInfo.getResourceClass().getSimpleName(),
-          resourceInfo.getResourceMethod().getName());
+          resource.getResourceClass().getSimpleName(),
+          resource.getResourceMethod().getName());
 
       var originalContent = context.getInputStream().readAllBytes();
 
       var request = new String(originalContent, StandardCharsets.UTF_8);
-      var schema = resourceInfo.getResourceMethod()
+      var schema = resource.getResourceMethod()
           .getAnnotation(ValidateRequest.class).schema();
       try {
         validator.validate(request, schema);

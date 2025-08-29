@@ -40,28 +40,29 @@ class ValidateResponseTest {
         }
         """;
 
-    final var schema = """
-        type: object
-        properties:
-          foo:
-            type: string
-        required:
-          - foo
-        """;
-
     class Resource {
 
-      @ValidateResponse(schema = schema)
+      static final String RESPONSE_SCHEMA = """
+          type: object
+          properties:
+            foo:
+              type: string
+          required:
+            - foo
+          """;
+
+      @ValidateResponse(schema = RESPONSE_SCHEMA)
       public String operation() {
         return response;
       }
+
     }
 
     var context = prepareContext(response, Resource.class);
 
     interceptor.aroundWriteTo(context);
 
-    verify(validator).validate(eq(response), eq(schema));
+    verify(validator).validate(eq(response), eq(Resource.RESPONSE_SCHEMA));
   }
 
   @Test
@@ -71,21 +72,22 @@ class ValidateResponseTest {
         }
         """;
 
-    final var schema = """
-        type: object
-        properties:
-          foo:
-            type: string
-        required:
-          - foo
-        """;
-
     class Resource {
 
-      @ValidateResponse(schema = schema)
+      static final String RESPONSE_SCHEMA = """
+          type: object
+          properties:
+            foo:
+              type: string
+          required:
+            - foo
+          """;
+
+      @ValidateResponse(schema = RESPONSE_SCHEMA)
       public String operation() {
         return response;
       }
+
     }
 
     var context = prepareContext(response, Resource.class);
@@ -95,24 +97,23 @@ class ValidateResponseTest {
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
         exception.getResponse().getStatus());
 
-    verify(validator).validate(eq(response), eq(schema));
+    verify(validator).validate(eq(response), eq(Resource.RESPONSE_SCHEMA));
   }
 
   @SneakyThrows
   private WriterInterceptorContext prepareContext(String responseBody, Class<?> resourceClass) {
     class StreamWrapper {
 
-      OutputStream outputStream;
+      OutputStream stream;
     }
 
     var wrapper = new StreamWrapper();
-    wrapper.outputStream = new ByteArrayOutputStream();
+    wrapper.stream = new ByteArrayOutputStream();
 
     var context = mock(WriterInterceptorContext.class);
-    doAnswer(it -> wrapper.outputStream)
-        .when(context).getOutputStream();
+    doAnswer(it -> wrapper.stream).when(context).getOutputStream();
     doAnswer(it -> {
-      wrapper.outputStream = it.getArgument(0, OutputStream.class);
+      wrapper.stream = it.getArgument(0, OutputStream.class);
       return null;
     }).when(context).setOutputStream(any());
     doAnswer(it -> {
@@ -121,13 +122,11 @@ class ValidateResponseTest {
       return null;
     }).when(context).proceed();
 
-    var resourceInfo = mock(ResourceInfo.class);
-    doReturn(resourceClass)
-        .when(resourceInfo).getResourceClass();
-    doReturn(resourceClass.getMethod("operation"))
-        .when(resourceInfo).getResourceMethod();
+    var resource = mock(ResourceInfo.class);
+    doReturn(resourceClass).when(resource).getResourceClass();
+    doReturn(resourceClass.getMethod("operation")).when(resource).getResourceMethod();
 
-    interceptor.resourceInfo = resourceInfo;
+    interceptor.resource = resource;
 
     return context;
   }
