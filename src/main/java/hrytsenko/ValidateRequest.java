@@ -2,7 +2,9 @@ package hrytsenko;
 
 import jakarta.enterprise.util.Nonbinding;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.ConstrainedTo;
 import jakarta.ws.rs.NameBinding;
+import jakarta.ws.rs.RuntimeType;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
@@ -29,6 +31,7 @@ public @interface ValidateRequest {
   @Slf4j
   @Provider
   @ValidateRequest
+  @ConstrainedTo(RuntimeType.SERVER)
   class Interceptor implements ReaderInterceptor {
 
     @Context
