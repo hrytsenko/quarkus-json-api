@@ -13,3 +13,17 @@ for [Quarkus REST](https://quarkus.io/guides/rest).
 
 * [Jackson Dataformat YAML](https://github.com/FasterXML/jackson-dataformats-text) — parse YAML schemas.
 * [JSON Schema Validator](https://github.com/everit-org/json-schema/) — validate JSON against schemas. 
+
+## Commands
+
+Run:
+
+```shell
+quarkus dev
+```
+
+Test:
+
+```shell
+docker run --rm -t -v ${PWD}:/workdir jetbrains/intellij-http-client -D explore.rest
+```
