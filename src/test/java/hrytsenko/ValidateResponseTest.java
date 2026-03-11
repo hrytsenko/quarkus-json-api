@@ -111,12 +111,12 @@ class ValidateResponseTest {
     wrapper.stream = new ByteArrayOutputStream();
 
     var context = mock(WriterInterceptorContext.class);
-    doAnswer(it -> wrapper.stream).when(context).getOutputStream();
+    doAnswer(_ -> wrapper.stream).when(context).getOutputStream();
     doAnswer(it -> {
       wrapper.stream = it.getArgument(0, OutputStream.class);
       return null;
     }).when(context).setOutputStream(any());
-    doAnswer(it -> {
+    doAnswer(_ -> {
       context.getOutputStream().write(responseBody.getBytes());
       context.getOutputStream().flush();
       return null;
