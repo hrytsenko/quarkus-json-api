@@ -1,7 +1,5 @@
 package hrytsenko;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 import lombok.Getter;
@@ -9,6 +7,8 @@ import lombok.SneakyThrows;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.yaml.YAMLFactory;
 
 @ApplicationScoped
 public class SchemaValidator {
