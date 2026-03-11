@@ -27,16 +27,16 @@ public class PhoneResource {
             - phone
           additionalProperties: false
           """)
-  public ClientResponse getPhone(@PathParam("username") String username) {
+  public GetPhoneResponse getPhone(@PathParam("username") String username) {
     log.info("Get phone for '{}'", username);
     return switch (username) {
-      case "alice" -> new ClientResponse("380950000000");
-      case "bob" -> new ClientResponse("+380950000000");
+      case "alice" -> new GetPhoneResponse("380950000000");
+      case "bob" -> new GetPhoneResponse("+380950000000");
       default -> throw new BadRequestException("Unknown username");
     };
   }
 
-  public record ClientResponse(String phone) {
+  public record GetPhoneResponse(String phone) {
 
   }
 
@@ -53,11 +53,11 @@ public class PhoneResource {
             - phone
           additionalProperties: false
           """)
-  public void updatePhone(@PathParam("username") String username, ClientRequest request) {
+  public void updatePhone(@PathParam("username") String username, UpdatePhoneRequest request) {
     log.info("Set phone for '{}' to '{}'", username, request);
   }
 
-  public record ClientRequest(String phone) {
+  public record UpdatePhoneRequest(String phone) {
 
   }
 
