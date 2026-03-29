@@ -21,4 +21,11 @@ jobs:
       - name: Configure Wrapper
         run: chmod +x mvnw
       - name: Build application
-        run: ./mvnw -B verify
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: >
+          ./mvnw -B verify
+          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          -Dsonar.organization=hrytsenko
+          -Dsonar.projectKey=hrytsenko_quarkus-json-api
+          -Pcoverage
