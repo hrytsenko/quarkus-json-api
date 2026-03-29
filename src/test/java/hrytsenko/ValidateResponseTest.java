@@ -3,7 +3,6 @@ package hrytsenko;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -62,7 +61,7 @@ class ValidateResponseTest {
 
     interceptor.aroundWriteTo(context);
 
-    verify(validator).validate(eq(response), eq(Resource.RESPONSE_SCHEMA));
+    verify(validator).validate(response, Resource.RESPONSE_SCHEMA);
   }
 
   @Test
@@ -97,7 +96,7 @@ class ValidateResponseTest {
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
         exception.getResponse().getStatus());
 
-    verify(validator).validate(eq(response), eq(Resource.RESPONSE_SCHEMA));
+    verify(validator).validate(response, Resource.RESPONSE_SCHEMA);
   }
 
   @SneakyThrows

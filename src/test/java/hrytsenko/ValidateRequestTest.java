@@ -2,7 +2,6 @@ package hrytsenko;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -57,7 +56,7 @@ class ValidateRequestTest {
 
     interceptor.aroundReadFrom(context);
 
-    verify(validator).validate(eq(request), eq(Resource.REQUEST_SCHEMA));
+    verify(validator).validate(request, Resource.REQUEST_SCHEMA);
   }
 
   @Test
@@ -89,7 +88,7 @@ class ValidateRequestTest {
         () -> interceptor.aroundReadFrom(context));
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), exception.getResponse().getStatus());
 
-    verify(validator).validate(eq(request), eq(Resource.REQUEST_SCHEMA));
+    verify(validator).validate(request, Resource.REQUEST_SCHEMA);
   }
 
   @SneakyThrows
