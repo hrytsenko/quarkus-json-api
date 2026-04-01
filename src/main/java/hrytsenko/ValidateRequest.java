@@ -1,13 +1,11 @@
 package hrytsenko;
 
 import jakarta.enterprise.util.Nonbinding;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.ConstrainedTo;
 import jakarta.ws.rs.NameBinding;
 import jakarta.ws.rs.RuntimeType;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.container.ResourceInfo;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 import jakarta.ws.rs.ext.ReaderInterceptor;
@@ -18,7 +16,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.nio.charset.StandardCharsets;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 @NameBinding
@@ -32,11 +33,11 @@ public @interface ValidateRequest {
   @Provider
   @ValidateRequest
   @ConstrainedTo(RuntimeType.SERVER)
+  @AllArgsConstructor
+  @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
   class Interceptor implements ReaderInterceptor {
 
-    @Context
     ResourceInfo resource;
-    @Inject
     SchemaValidator validator;
 
     @SneakyThrows

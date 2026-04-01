@@ -18,18 +18,22 @@ import org.junit.jupiter.api.Test;
 
 class ValidateRequestTest {
 
-  ValidateRequest.Interceptor interceptor;
   SchemaValidator validator;
 
   @BeforeEach
   void init() {
     validator = spy(new SchemaValidator());
-    interceptor = new ValidateRequest.Interceptor();
-    interceptor.validator = validator;
   }
 
   @Test
   void validRequest() {
+    var request = """
+        {
+          "foo": "bar"
+        }
+        """;
+    var context = prepareContext(request);
+
     class Resource {
 
       static final String REQUEST_SCHEMA = """
@@ -43,16 +47,11 @@ class ValidateRequestTest {
 
       @ValidateRequest(schema = REQUEST_SCHEMA)
       public void operation(String request) {
+        /* Do nothing. */
       }
 
     }
-
-    var request = """
-        {
-          "foo": "bar"
-        }
-        """;
-    var context = prepareContext(request, Resource.class);
+    var interceptor = prepareInterceptor(Resource.class);
 
     interceptor.aroundReadFrom(context);
 
@@ -61,6 +60,12 @@ class ValidateRequestTest {
 
   @Test
   void invalidRequest() {
+    var request = """
+        {
+        }
+        """;
+    var context = prepareContext(request);
+
     class Resource {
 
       static final String REQUEST_SCHEMA = """
@@ -74,15 +79,11 @@ class ValidateRequestTest {
 
       @ValidateRequest(schema = REQUEST_SCHEMA)
       public void operation(String request) {
+        /* Do nothing. */
       }
 
     }
-
-    var request = """
-        {
-        }
-        """;
-    var context = prepareContext(request, Resource.class);
+    var interceptor = prepareInterceptor(Resource.class);
 
     var exception = assertThrows(WebApplicationException.class,
         () -> interceptor.aroundReadFrom(context));
@@ -92,19 +93,19 @@ class ValidateRequestTest {
   }
 
   @SneakyThrows
-  private ReaderInterceptorContext prepareContext(String requestBody, Class<?> resourceClass) {
-    var context = mock(ReaderInterceptorContext.class);
-    doReturn(new ByteArrayInputStream(requestBody.getBytes()))
-        .when(context).getInputStream();
-
+  private ValidateRequest.Interceptor prepareInterceptor(Class<?> resourceClass) {
     var resource = mock(ResourceInfo.class);
     doReturn(resourceClass)
         .when(resource).getResourceClass();
     doReturn(resourceClass.getMethod("operation", String.class))
         .when(resource).getResourceMethod();
+    return new ValidateRequest.Interceptor(resource, validator);
+  }
 
-    interceptor.resource = resource;
-
+  private ReaderInterceptorContext prepareContext(String requestBody) {
+    var context = mock(ReaderInterceptorContext.class);
+    doReturn(new ByteArrayInputStream(requestBody.getBytes()))
+        .when(context).getInputStream();
     return context;
   }
 

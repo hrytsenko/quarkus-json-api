@@ -21,14 +21,11 @@ import org.junit.jupiter.api.Test;
 
 class ValidateResponseTest {
 
-  ValidateResponse.Interceptor interceptor;
   SchemaValidator validator;
 
   @BeforeEach
   void init() {
     validator = spy(new SchemaValidator());
-    interceptor = new ValidateResponse.Interceptor();
-    interceptor.validator = validator;
   }
 
   @Test
@@ -38,6 +35,7 @@ class ValidateResponseTest {
           "foo": "bar"
         }
         """;
+    var context = prepareContext(response);
 
     class Resource {
 
@@ -56,8 +54,7 @@ class ValidateResponseTest {
       }
 
     }
-
-    var context = prepareContext(response, Resource.class);
+    var interceptor = prepareInterceptor(Resource.class);
 
     interceptor.aroundWriteTo(context);
 
@@ -70,6 +67,7 @@ class ValidateResponseTest {
         {
         }
         """;
+    var context = prepareContext(response);
 
     class Resource {
 
@@ -88,8 +86,7 @@ class ValidateResponseTest {
       }
 
     }
-
-    var context = prepareContext(response, Resource.class);
+    var interceptor = prepareInterceptor(Resource.class);
 
     var exception = assertThrows(WebApplicationException.class,
         () -> interceptor.aroundWriteTo(context));
@@ -100,7 +97,15 @@ class ValidateResponseTest {
   }
 
   @SneakyThrows
-  private WriterInterceptorContext prepareContext(String responseBody, Class<?> resourceClass) {
+  private ValidateResponse.Interceptor prepareInterceptor(Class<?> resourceClass) {
+    var resource = mock(ResourceInfo.class);
+    doReturn(resourceClass).when(resource).getResourceClass();
+    doReturn(resourceClass.getMethod("operation")).when(resource).getResourceMethod();
+    return new ValidateResponse.Interceptor(resource, validator);
+  }
+
+  @SneakyThrows
+  private WriterInterceptorContext prepareContext(String responseBody) {
     class StreamWrapper {
 
       OutputStream stream;
@@ -120,12 +125,6 @@ class ValidateResponseTest {
       context.getOutputStream().flush();
       return null;
     }).when(context).proceed();
-
-    var resource = mock(ResourceInfo.class);
-    doReturn(resourceClass).when(resource).getResourceClass();
-    doReturn(resourceClass.getMethod("operation")).when(resource).getResourceMethod();
-
-    interceptor.resource = resource;
 
     return context;
   }
